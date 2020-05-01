@@ -1,4 +1,7 @@
 const isNull = (value: any) => {
   return value === null;
 };
-export { isNull };
+const deepCopy = (value: any): any => {
+  return JSON.parse(JSON.stringify(value));
+};
+export { isNull, deepCopy };

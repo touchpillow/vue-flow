@@ -14,6 +14,7 @@
     "quotes": [1, "double"],
     "trailing-comma": false,
     "arrow-parens": false,
-    "curly": false
+    "curly": false,
+    "member-ordering": false
   }
 }
