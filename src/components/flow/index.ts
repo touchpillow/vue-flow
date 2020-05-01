@@ -6,9 +6,11 @@ import {
   FlowLineConfig,
   FlowLineItem,
   TipLine,
-  CommonSelectData
+  CommonSelectData,
+  FlowEventParams,
+  FlowNodeInfo
 } from "types/flow";
-import { deepCopy } from "@/assets/util";
+import { deepCopy, valueRoundByStep } from "@/assets/util";
 import { defaultLineData, circleDirection } from "./config";
 import { SpecialValueMap } from "types/global";
 
@@ -194,9 +196,175 @@ export default class Flow extends Vue {
     this.refreshLineData();
   }
 
+  private dragStartItemHandle(params: FlowEventParams) {
+    this.dragStartItem(params.event, params.id);
+  }
+
+  private dropItemHandle(params: FlowEventParams) {
+    const item = this.findItemById(params.id);
+    if (!item) return;
+    this.dropItem(params.event, params.id);
+  }
+
+  private dragEndItemHandle(params: FlowEventParams<MouseEvent>) {
+    this.dragEndItem(params.event);
+  }
+
+  private dragingItemHanlde(params: FlowEventParams) {
+    const item = this.findItemById(params.id);
+    if (!item) return;
+    this.dragingItem(params.event, item);
+  }
+
+  private createLineHandle(params: FlowEventParams) {
+    const item = this.findItemById(params.id);
+    if (!item) return;
+    this.createLine(item, params.direction);
+  }
+
+  private moveOnCircleHandle(params: FlowEventParams) {
+    const item = this.findItemById(params.id);
+    if (!item) return;
+    this.moveOnCircle(item, params.direction);
+  }
+
+  private moveOnNodeHanlde(params: FlowEventParams) {
+    const item = this.findItemById(params.id);
+    if (!item) return;
+    this.moveOnNode(params.event, item);
+  }
+
   private updateCanvasScale() {
     this.listData.forEach(item => {
       item.canvasScale = this.canvasScale;
     });
+  }
+
+  public created() {
+    this.eventBus.$on("dragStartItem", this.dragStartItemHandle);
+
+    this.eventBus.$on("dropItem", this.dropItemHandle);
+
+    this.eventBus.$on("dragEndItem", this.dragEndItemHandle);
+
+    this.eventBus.$on("dragingItem", this.dragingItemHanlde);
+
+    this.eventBus.$on("createLine", this.createLineHandle);
+
+    this.eventBus.$on("moveOnCircle", this.moveOnCircleHandle);
+
+    this.eventBus.$on("moveOnNode", this.moveOnNodeHanlde);
+  }
+
+  private initNodeLayout() {
+    if (this.listData.length < 2) return;
+    this.initCanvasScale();
+    const leftSide = this.listData.map(item => item.x - item.w / 2).sort();
+    const rightSide = this.listData
+      .map(item => item.x + item.w / 2)
+      .sort()
+      .reverse();
+    const topSide = this.listData.map(item => item.y - item.h / 2).sort();
+    const bottomSide = this.listData
+      .map(item => item.y + item.h / 2)
+      .sort()
+      .reverse();
+    const x = (leftSide[0] + rightSide[0]) / 2;
+    const y = (topSide[0] + bottomSide[0]) / 2;
+    const basicX = 5000;
+    const basicY = 2500;
+    const moveX = valueRoundByStep(basicX - x, this.moveStep);
+    const moveY = valueRoundByStep(basicY - y, this.moveStep);
+    this.listData.forEach(item => {
+      item.x += moveX;
+      item.y += moveY;
+    });
+  }
+
+  private findItemById(id: string) {
+    return this.listData.find(item => item.id === id);
+  }
+
+  private async refreshLineDataList() {
+    this.lineDataListArray = this.deepGetCreateDate(
+      this.listData,
+      [],
+      this.getLineData
+    );
+  }
+
+  private get isPreviewMode() {
+    return this.mode === "preview";
+  }
+  private get isLimitEditMode() {
+    return this.mode === "limitEdit";
+  }
+
+  private get PathMap() {
+    return this.lineDataListArray.reduce(
+      (res: SpecialValueMap<FlowLineItem>, item: FlowLineItem) => {
+        if (!item.path) return res;
+        res[`${item.originId}-${item.targetId}`] = item;
+        return res;
+      },
+      {}
+    );
+  }
+
+  private get isCurrentDragingItem() {
+    // return (!!this.currentDragItem)||this.isCreatedTempLine
+    return true;
+  }
+
+  private initLineListStyle() {
+    this.listData.forEach(item => {
+      item.lineData.forEach(lineItem => {
+        lineItem.lineStyle = "solid";
+      });
+    });
+  }
+
+  public async initLineListData() {
+    this.$nextTick(() => {
+      this.initNodeLayout();
+      this.updateCanvasScale();
+      this.initLineListStyle();
+      this.refreshLineData();
+    });
+  }
+
+  @Watch("listData.length")
+  public async checkLineData(val: number) {
+    if (!val) return;
+    this.initCanvasScale();
+    this.checkIdData();
+    await this.refreshLineData("change");
+  }
+
+  @Watch("isAutoCompose")
+  public composeNodes(val: boolean) {
+    if (!val) return;
+    this.composeNodeList();
+  }
+
+  private composeNodeList() {
+    const nodeRelation: SpecialValueMap<FlowNodeInfo> = {};
+    const hasCalcNode: string[] = [];
+    this.listData.forEach(item => {
+      this.getNodeRelation(item, nodeRelation, hasCalcNode);
+    });
+  }
+
+  private composeNodeLayout(
+    nodeRelation: SpecialValueMap<FlowNodeInfo>,
+    parentX = 0
+  ) {
+    const ids = Object.keys(nodeRelation);
+    if (ids.length < 1) return;
+    if (ids.length < 0) {
+      this.composeNodeX(ids, parentX);
+    }
+    const basicY: number =
+      ids.map(item => this.findItemById(item)).find(item => !!item)?.y ?? 0;
   }
 }

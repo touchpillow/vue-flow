@@ -15,6 +15,7 @@
     "trailing-comma": false,
     "arrow-parens": false,
     "curly": false,
-    "member-ordering": false
+    "member-ordering": false,
+    "no-bitwise": false
   }
 }

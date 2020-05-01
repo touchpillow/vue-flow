@@ -1,4 +1,5 @@
 import Vue from "vue-property-decorator";
+import { SpecialValueMap } from "./global";
 
 export interface FlowProvide {
   instance: Vue.Vue;
@@ -45,4 +46,19 @@ export interface TipLine {
 export interface CommonSelectData<T = string> {
   label: string;
   value: T;
+}
+export interface FlowEventParams<T = DragEvent> {
+  event: T;
+  id: string;
+  direction: number;
+}
+export interface FlowEmitParams<T = DragEvent> {
+  event?: T;
+  id?: string;
+  direction?: number;
+}
+export interface FlowNodeInfo {
+  x: number;
+  y: number;
+  children: SpecialValueMap<FlowNodeInfo>;
 }

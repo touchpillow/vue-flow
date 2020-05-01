@@ -4,4 +4,19 @@ const isNull = (value: any) => {
 const deepCopy = (value: any): any => {
   return JSON.parse(JSON.stringify(value));
 };
-export { isNull, deepCopy };
+const valueRoundByStep = (value: number, step: number, basic = 0) => {
+  return Math.round((value - basic) / step) * step + basic;
+};
+const valueCeilByStep = (value: number, step: number, basic = 0) => {
+  return Math.ceil((value - basic) / step) * step + basic;
+};
+const valueFloorByStep = (value: number, step: number, basic = 0) => {
+  return (((value - basic) / step) | 0) * step + basic;
+};
+export {
+  isNull,
+  deepCopy,
+  valueCeilByStep,
+  valueFloorByStep,
+  valueRoundByStep
+};
