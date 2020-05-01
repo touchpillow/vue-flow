@@ -10,7 +10,12 @@ import {
   FlowEventParams,
   FlowNodeInfo
 } from "types/flow";
-import { deepCopy, valueRoundByStep } from "@/assets/util";
+import {
+  deepCopy,
+  valueRoundByStep,
+  valueCeilByStep,
+  getArithmeticbyStep
+} from "@/assets/util";
 import { defaultLineData, circleDirection } from "./config";
 import { SpecialValueMap } from "types/global";
 
@@ -353,6 +358,22 @@ export default class Flow extends Vue {
     this.listData.forEach(item => {
       this.getNodeRelation(item, nodeRelation, hasCalcNode);
     });
+
+    // compose node again
+    const firstLevelNode = Object.keys(nodeRelation);
+    firstLevelNode.forEach(item => {
+      const node = this.findItemById(item);
+      if (!node || !node.lineData.length) return;
+      const parentNode = node.lineData
+        .map(lineItem => lineItem.originId)
+        .find(nodeItem => firstLevelNode.includes(nodeItem));
+      if (!parentNode) return;
+      nodeRelation[parentNode].children[item] = nodeRelation[item];
+      Reflect.deleteProperty(nodeRelation, item);
+    });
+
+    this.composeNodeLayout(nodeRelation);
+    this.refreshLineData();
   }
 
   private composeNodeLayout(
@@ -364,7 +385,85 @@ export default class Flow extends Vue {
     if (ids.length < 0) {
       this.composeNodeX(ids, parentX);
     }
-    const basicY: number =
-      ids.map(item => this.findItemById(item)).find(item => !!item)?.y ?? 0;
+    const item = ids.map(item => this.findItemById(item)).find(item => !!item);
+    if (!item) return;
+    const basicY = item.y;
+    ids.forEach(item => {
+      const node = this.findItemById(item);
+      if (!node) return;
+      if (basicY) {
+        node.y = basicY;
+      }
+      this.composeNodeLayout(nodeRelation[item].children, node.x);
+    });
+  }
+
+  private composeNodeX(ids: string[], parentX: number) {
+    if (!parentX) return;
+    const nodeList = (ids.map(item =>
+      this.findItemById(item)
+    ) as FlowNodeItem[]).sort(
+      (pre: FlowNodeItem, next: FlowNodeItem) => pre.x - next.x
+    );
+    const xList = nodeList.map(item => item.x);
+    let xSpace = valueRoundByStep(
+      (Math.max(...xList) - Math.min(...xList)) / (xList.length - 1),
+      this.moveStep * 2
+    );
+    xSpace = Math.max(
+      valueCeilByStep(nodeList[0].w + this.moveStep * 2, this.moveStep * 2),
+      xSpace
+    );
+    const newXList = getArithmeticbyStep(parentX, xSpace, ids.length);
+    nodeList.forEach((item: FlowNodeItem, index: number) => {
+      item.x = newXList[index];
+    });
+  }
+
+  private getNodeRelation(
+    node: FlowNodeItem,
+    relation: SpecialValueMap<FlowNodeInfo>,
+    hasCalcNode: string[]
+  ) {
+    if (hasCalcNode.includes(node.id)) return;
+    hasCalcNode.push(node.id);
+    relation[node.id] = {
+      x: node.x,
+      y: node.y,
+      children: {}
+    };
+    const childNode = [...new Set(node.childNode)];
+    if (childNode.length) {
+      childNode.forEach(item => {
+        const childNode = this.findItemById(item);
+        if (!childNode) return;
+        this.getNodeRelation(
+          childNode,
+          relation[node.id].children,
+          hasCalcNode
+        );
+      });
+    }
+  }
+
+  private initCanvasScale() {
+    const firstNodeScale = this.listData[0].canvasScale;
+    if (firstNodeScale !== this.canvasScale) {
+      if (!firstNodeScale) return;
+      this.changeCanvasScale(firstNodeScale);
+    }
+  }
+
+  private get currentDragItemLayout() {
+    const defaultLayout = { x: 0, y: 0 };
+    if (!this.currentDragItem) {
+      return defaultLayout;
+    }
+    const item = this.findItemById(this.currentDragItem);
+    if (!item) return;
+    return {
+      x: item.x,
+      y: item.y
+    };
   }
 }
