@@ -1,16 +1,10 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import Home from "../views/Home.vue";
 Vue.use(VueRouter);
 
 const routes: RouteConfig[] = [
   {
     path: "/",
-    name: "Home",
-    component: Home
-  },
-  {
-    path: "/home",
     name: "home",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route

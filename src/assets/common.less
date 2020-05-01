@@ -1,8 +1,41 @@
 .flex {
   display: flex;
+  align-content: stretch;
+  flex-flow: row wrap;
   &.column {
     flex-direction: column;
   }
+  .xy-axis-center {
+    align-items: center;
+    justify-content: center;
+  }
+  .x-axis-center {
+    justify-content: center;
+  }
+  .y-axis-center {
+    align-items: center;
+  }
+  .x-axis-between {
+    justify-content: space-between;
+  }
+  .x-axis-evenly {
+    justify-content: space-evenly;
+  }
+  .x-axis-around {
+    justify-content: space-around;
+  }
+  .y-axis-start {
+    align-content: flex-start;
+  }
+  .y-axis-end {
+    align-content: flex-end;
+  }
+  .stretch {
+    align-content: stretch;
+  }
+}
+.flex-nowrap {
+  flex-wrap: nowrap;
 }
 .flex-auto {
   flex: auto;
