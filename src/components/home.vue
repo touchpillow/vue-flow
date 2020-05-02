@@ -8,10 +8,10 @@
 </template>
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
-import { Left } from "./index.view";
+import { Left, FlowItem, Flow } from "./index.view";
 @Component({
   name: "Home",
-  components: { Left }
+  components: { Left, FlowItem, Flow },
 })
 export default class Home extends Vue {
   public status = false;

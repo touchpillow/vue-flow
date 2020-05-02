@@ -37,9 +37,13 @@ import {
   drawWithArrowheads,
 } from "./config";
 import { SpecialValueMap } from "types/global";
+import { ToolBox } from "../index.view";
 
 @Component({
   name: "Flow",
+  components: {
+    ToolBox,
+  },
 })
 export default class Flow extends Vue {
   @Prop({ type: String, default: "请拖入节点进行组合" })
