@@ -62,3 +62,23 @@ export interface FlowNodeInfo {
   y: number;
   children: SpecialValueMap<FlowNodeInfo>;
 }
+export interface FlowItemSize {
+  w: number;
+  h: number;
+}
+export interface FlowTipConfig {
+  vertical: {
+    key: keyof FlowNodeLayout;
+    item: keyof FlowItemSize;
+  };
+  horizontal: {
+    key: keyof FlowNodeLayout;
+    item: keyof FlowItemSize;
+  };
+}
+export interface FlowNodeLayoutBorder {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}

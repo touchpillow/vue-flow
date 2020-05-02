@@ -33,11 +33,15 @@ const getArithmeticbyStep = (
   }
   return res;
 };
+const inRange = (valueRange: number[], value: number) => {
+  return value >= valueRange[0] && value <= valueRange[1];
+};
 export {
   isNull,
   deepCopy,
   valueCeilByStep,
   valueFloorByStep,
   valueRoundByStep,
-  getArithmeticbyStep
+  getArithmeticbyStep,
+  inRange,
 };
