@@ -2,6 +2,7 @@
   <div
     ref="flowContainer"
     class="flow"
+    :style="getFlowStyle"
     @dragover="dragOver($event)"
     @dragenter="dragEnter($event)"
     @click.stop="clickCanvas($event)"

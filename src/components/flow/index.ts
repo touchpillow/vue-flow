@@ -72,6 +72,10 @@ export default class Flow extends Vue {
 
   @Prop({ type: String, default: "edit" })
   private mode!: string;
+  @Prop({ type: String, default: "#f7f7f7" })
+  private canvasBg!: string;
+  @Prop({ type: String, default: "solid" })
+  private defaultLineStyle!: string;
 
   @Provide()
   private provider: FlowProvide = {
@@ -528,6 +532,12 @@ export default class Flow extends Vue {
     return this.showTipLine("horizontal");
   }
 
+  public get getFlowStyle() {
+    return {
+      "background-color": this.canvasBg,
+    };
+  }
+
   public get getContainerStyle() {
     const offsetX =
       this.offsetX - this.canvasMoveDistance.x - this.tempCanvasMoveDistance.x;
@@ -539,8 +549,9 @@ export default class Flow extends Vue {
       left: `-${offsetX}px`,
       top: `-${offsetY}px`,
       transform: `scale(${this.canvasScale / 100})`,
-      "transform-origin": `${offsetX + canvas?.width ?? 0 / 2}px ${offsetY +
-        canvas?.height ?? 0 / 2}px`,
+      "transform-origin": `${offsetX + (canvas?.width ?? 0) / 2}px ${offsetY +
+        (canvas?.height ?? 0) / 2}px`,
+      // "background-color": this.canvasBg,
     };
   }
 
@@ -686,7 +697,7 @@ export default class Flow extends Vue {
     if (!this.currentDragItem) return;
     if (this.initLayout.x === 0 || this.initLayout.y === 0) return;
     const newX = valueFloorByStep(e.screenX - this.initLayout.x, this.moveStep);
-    const newY = valueFloorByStep(e.screenX - this.initLayout.y, this.moveStep);
+    const newY = valueFloorByStep(e.screenY - this.initLayout.y, this.moveStep);
     if (
       [this.moveInitX + newX - item.x, this.moveInitY + newY - item.y].some(
         (item) => !!item
@@ -700,11 +711,14 @@ export default class Flow extends Vue {
   }
 
   private createLine(item: FlowNodeItem, direction: number) {
-    if (this.lineData.isOrigin && direction === circleDirection.top) return;
-    if (!this.lineData.isOrigin && direction === circleDirection.bottom) {
+    if (
+      (this.lineData.isOrigin && direction === circleDirection.top) ||
+      (!this.lineData.isOrigin && direction === circleDirection.bottom)
+    ) {
       this.initLineData();
+      this.refreshLineData("new");
+      return;
     }
-    debugger;
     this.lineData.isOrigin = !this.lineData.isOrigin;
     if (!this.lineData.isOrigin) {
       this.lineData.origin.id = item.id;
@@ -772,6 +786,7 @@ export default class Flow extends Vue {
   }
 
   public createdTempLine(e: MouseEvent) {
+    if (this.lineData.isOrigin) return;
     const x = e.offsetX;
     const y = e.offsetY;
     this.lineData.origin.targetDirection = circleDirection.top;
@@ -779,11 +794,13 @@ export default class Flow extends Vue {
   }
 
   private moveOnNode(e: MouseEvent, item: FlowNodeItem) {
+    if (this.lineData.isOrigin) return;
     const x = e.offsetX + item.x - item.w / 2;
     const y = e.offsetY + item.y - item.h / 2;
     this.refreshTempLine({ x, y });
   }
   private moveOnCircle(item: FlowNodeItem, direction: number) {
+    if (this.lineData.isOrigin) return;
     const x = item.x;
     const y = item.y + (direction * item.h) / 2;
     this.refreshTempLine({ x, y });
@@ -1074,7 +1091,8 @@ export default class Flow extends Vue {
         return !curItemList.includes(`${item.originId}-${item.targetId}`);
       })
       .filter((item) => {
-        return item.lineStyle !== "dash";
+        // return item.lineStyle !== "dash";
+        return item.lineStyle === this.defaultLineStyle;
       })
       .reduce((res: Path2D, item: FlowLineItem) => {
         if (!item.path) return res;
@@ -1216,12 +1234,12 @@ export default class Flow extends Vue {
       .map((item) => item.y + item.h / 2)
       .sort()
       .reverse();
-    const scaleX =
-      valueFloorByStep(this.flowContainer.clientWidth * 90) /
-      (rightSide[0] - leftSide[0]);
-    const scaleY =
-      valueFloorByStep(this.flowContainer.clientHeight * 90) /
-      (bottomSide[0] - topSide[0]);
+    const scaleX = valueFloorByStep(
+      (this.flowContainer.clientWidth * 90) / (rightSide[0] - leftSide[0])
+    );
+    const scaleY = valueFloorByStep(
+      (this.flowContainer.clientHeight * 90) / (bottomSide[0] - topSide[0])
+    );
     this.changeCanvasScale(suitScale(Math.min(scaleX, scaleY), this.scaleStep));
   }
 

@@ -64,7 +64,7 @@ export default class Home extends Vue {
   border-right: 1px solid #ccc;
 }
 .right {
-  background: #f7f7f7;
+  // background: #f7f7f7;
   width: 0;
 }
 .com-item {
@@ -73,5 +73,6 @@ export default class Home extends Vue {
   height: 36px;
   line-height: 36px;
   border: 1px solid skyblue;
+  cursor: move;
 }
 </style>

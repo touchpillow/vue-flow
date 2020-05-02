@@ -1,12 +1,12 @@
 <template>
   <div class="tool-box flex" @click.stop="void 0">
     <div v-show="showFun('scale')" class="scale-scale tool-part flex xy-axis-center">
-      <i class="el-icon-zoom-in scale-button" :title="`reduce`" @click="changeScale(-1)"></i>
+      <i class="el-icon-zoom-out scale-button" :title="`reduce`" @click="changeScale(-1)"></i>
       <div class="scale-text">{{ canvasScale }}%</div>
-      <i class="el-icon-zoom-out scale-button" :title="`plus`" @click="changeScale(1)"></i>
+      <i class="el-icon-zoom-in scale-button" :title="`plus`" @click="changeScale(1)"></i>
     </div>
     <div v-show="showFun('suit')" class="scale-suit tool-part flex xy-axis-center">
-      <i class="el-icon-aim"></i>
+      <i class="el-icon-aim" @click="suitToCanvas" :title="`suit`"></i>
     </div>
     <div v-show="showFun('move')" class="move-button tool-part flex xy-axis-center">
       <img
