@@ -1,7 +1,7 @@
 import { FlowLineConfig, TipLine, FlowTipConfig } from "types/flow";
 
 const defaultLineData: FlowLineConfig = {
-  isOrigin: false,
+  isOrigin: true,
   origin: {
     id: "",
     direction: 1,
@@ -116,10 +116,10 @@ function drawWithArrowheads(
   lineColor: string,
   lineStyle: string
 ) {
-  let x1 = x + offsetX;
-  let y1 = y + offsetY;
-  let x2 = x3 + offsetX;
-  let y2 = y3 + offsetY;
+  const x1 = x + offsetX;
+  const y1 = y + offsetY;
+  const x2 = x3 + offsetX;
+  const y2 = y3 + offsetY;
   // arbitrary styling
   ctx.strokeStyle = "#7c8baf";
   ctx.fillStyle = "#7c8baf";

@@ -94,3 +94,7 @@ export interface FlowEmitParams<T> {
   id?: string;
   direction?: number;
 }
+export interface FlowDropData<T> {
+  data: T;
+  layout: FlowNodeLayout;
+}

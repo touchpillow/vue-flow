@@ -27,7 +27,7 @@
       @click="clickLine($event)"
       @click.right.stop="rightClick($event)"
       @dragover="dragLeftItem($event)"
-      @mousemove.self="createdTempline($event)"
+      @mousemove.self="createdTempLine($event)"
       @drop.stop="dropCanvas($event)"
     >
       <canvas v-show="canvasIsMoveMode" ref="canvas" class="canvas" width="10000" height="5000"></canvas>
@@ -59,18 +59,18 @@
         @click="deleteLineItem"
         v-show="showLineDelButton"
       ></i>
-      <div v-show="!ispreviewMode" class="flow-tool" @dragover.stop="void 0">
-        <tool-box
-          :canvasIsMoveMode="canvasIsMoveMode"
-          :canvasScale="canvasScale"
-          :mode="mode"
-          :limitFun="limitFun"
-          :isAutoCompose="isAutoCompose"
-          @toolAction="toolAction"
-        ></tool-box>
-        <div v-if="!listData.length" class="full empty-box flex xy-axis-center">
-          <slot name="placeholder"></slot>
-        </div>
+    </div>
+    <div v-show="!isPreviewMode" class="flow-tool" @dragover.stop="void 0">
+      <tool-box
+        :canvasIsMoveMode="canvasIsMoveMode"
+        :canvasScale="canvasScale"
+        :mode="mode"
+        :limitFun="limitFun"
+        :isAutoCompose="isAutoCompose"
+        @toolAction="toolAction"
+      ></tool-box>
+      <div v-if="!listData.length" class="full empty-box flex xy-axis-center">
+        <slot name="placeholder"></slot>
       </div>
     </div>
   </div>

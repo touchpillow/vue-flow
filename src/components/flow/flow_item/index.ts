@@ -102,7 +102,7 @@ export default class FlowItem extends Vue {
 
   public moveOnCircle(e: MouseEvent, direction: number) {
     e.preventDefault();
-    this.emitEvent<MouseEvent>("moveOncircle", {
+    this.emitEvent<MouseEvent>("moveOnCircle", {
       id: this.itemData.id,
       direction,
     });

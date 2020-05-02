@@ -531,14 +531,16 @@ export default class Flow extends Vue {
   public get getContainerStyle() {
     const offsetX =
       this.offsetX - this.canvasMoveDistance.x - this.tempCanvasMoveDistance.x;
-    const offsetY = this.canvasMoveDistance.y - this.tempCanvasMoveDistance.y;
+    const offsetY =
+      this.offsetY - this.canvasMoveDistance.y - this.tempCanvasMoveDistance.y;
     const canvas = this.$refs.canvasCopy as HTMLCanvasElement;
+    // if (!canvas) return {};
     return {
       left: `-${offsetX}px`,
       top: `-${offsetY}px`,
       transform: `scale(${this.canvasScale / 100})`,
-      "transform-origin": `${offsetX + canvas.width / 2}px ${offsetY +
-        canvas.height / 2}px`,
+      "transform-origin": `${offsetX + canvas?.width ?? 0 / 2}px ${offsetY +
+        canvas?.height ?? 0 / 2}px`,
     };
   }
 
@@ -701,8 +703,8 @@ export default class Flow extends Vue {
     if (this.lineData.isOrigin && direction === circleDirection.top) return;
     if (!this.lineData.isOrigin && direction === circleDirection.bottom) {
       this.initLineData();
-      return;
     }
+    debugger;
     this.lineData.isOrigin = !this.lineData.isOrigin;
     if (!this.lineData.isOrigin) {
       this.lineData.origin.id = item.id;
@@ -1080,7 +1082,7 @@ export default class Flow extends Vue {
         return res;
       }, new Path2D());
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = "#7cbBAF";
+    ctx.strokeStyle = "#7c8baf";
     ctx.setLineDash([5, 0]);
     ctx.stroke(path);
   }
@@ -1296,9 +1298,9 @@ export default class Flow extends Vue {
     const item = this.findItemById(oldId);
     if (!item) return;
     item.id = newId;
-    item.lineData.forEach((item) => {
-      item.targetId = newId;
-      const parentNode = this.findItemById(item.originId);
+    item.lineData.forEach((lineItem) => {
+      lineItem.targetId = newId;
+      const parentNode = this.findItemById(lineItem.originId);
       if (!parentNode) return;
       replaceMembers(parentNode.childNode, oldId, newId);
     });
