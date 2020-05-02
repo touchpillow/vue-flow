@@ -1,4 +1,11 @@
-import { Vue, Component, Provide, Prop, Watch } from "vue-property-decorator";
+import {
+  Vue,
+  Component,
+  Provide,
+  Prop,
+  Watch,
+  Emit,
+} from "vue-property-decorator";
 import {
   FlowProvide,
   FlowNodeItem,
@@ -11,6 +18,7 @@ import {
   FlowNodeInfo,
   FlowTipConfig,
   FlowNodeLayoutBorder,
+  FlowLinePoint,
 } from "types/flow";
 import {
   deepCopy,
@@ -19,6 +27,8 @@ import {
   getArithmeticbyStep,
   valueFloorByStep,
   inRange,
+  suitScale,
+  replaceMembers,
 } from "@/assets/util";
 import {
   defaultLineData,
@@ -175,6 +185,7 @@ export default class Flow extends Vue {
         this.changeMoveMode();
         break;
       case "suit":
+        this.suitToCanvas();
         break;
       case "compose":
         this.changeCompose();
@@ -509,7 +520,7 @@ export default class Flow extends Vue {
   public get showVerticaltipLine(): boolean {
     return this.showTipLine("vertical");
   }
-  public get showHorizontalTipLinetipLine(): boolean {
+  public get showHorizontalTipLine(): boolean {
     return this.showTipLine("horizontal");
   }
 
@@ -1132,5 +1143,243 @@ export default class Flow extends Vue {
     this.initLayoutBorder();
     this.updateDefaultNodeLayout();
     await this.refreshLineData();
+  }
+
+  private initLayoutBorder() {
+    const canvas = this.$refs.canvas as HTMLCanvasElement;
+    const parentElement = this.flowContainer;
+    if (!parentElement) return;
+    this.offsetX = valueRoundByStep(
+      (canvas.width - parentElement.offsetWidth) / 2,
+      1
+    );
+    this.offsetY = valueRoundByStep(
+      (canvas.height - parentElement.offsetHeight) / 2,
+      1
+    );
+    const keyMaP: SpecialValueMap<(number | string)[]> = {
+      xMin: [0, "offsetX", "offsetWidth"],
+      yMin: [0, "offsetY", "offsetHeight"],
+      xMax: [1, "offsetX", "offsetWidth"],
+      yMax: [1, "offsetY", "offsetHeight"],
+    };
+    for (const key in keyMaP) {
+      this.layoutBorder[key] =
+        this[keyMaP[key][1] as keyof Flow] +
+        +keyMaP[key][0] *
+          Number(parentElement[keyMaP[key][2] as keyof HTMLElement]);
+    }
+  }
+
+  public dragCanvas(e: MouseEvent) {
+    e.preventDefault();
+    if (!this.isCanvasStartDrag) return;
+    this.tempCanvasMoveDistance.x = e.screenX - this.canvasDragOriginLayout.x;
+    this.tempCanvasMoveDistance.y = e.screenY - this.canvasDragOriginLayout.y;
+  }
+
+  public canvasStartDrag(e: MouseEvent) {
+    if (e.button !== 0) return;
+    this.isCanvasStartDrag = true;
+    this.canvasDragOriginLayout = {
+      x: e.screenX,
+      y: e.screenY,
+    };
+  }
+  public canvasEndDrag(e: MouseEvent) {
+    e.preventDefault();
+    this.isCanvasStartDrag = false;
+    this.canvasMoveDistance.x += this.tempCanvasMoveDistance.x;
+    this.canvasMoveDistance.y += this.tempCanvasMoveDistance.y;
+    this.canvasDragOriginLayout = this.tempCanvasMoveDistance = { x: 0, y: 0 };
+  }
+
+  public suitToCanvas() {
+    if (this.canvasIsMoveMode) return;
+    if (this.listData.length < 2) return;
+    this.canvasMoveDistance.x = 0;
+    this.canvasMoveDistance.y = 0;
+    this.initNodeLayout();
+    const leftSide = this.listData.map((item) => item.x - item.w / 2).sort();
+    const rightSide = this.listData
+      .map((item) => item.x + item.w / 2)
+      .sort()
+      .reverse();
+    const topSide = this.listData.map((item) => item.y - item.h / 2).sort();
+    const bottomSide = this.listData
+      .map((item) => item.y + item.h / 2)
+      .sort()
+      .reverse();
+    const scaleX =
+      valueFloorByStep(this.flowContainer.clientWidth * 90) /
+      (rightSide[0] - leftSide[0]);
+    const scaleY =
+      valueFloorByStep(this.flowContainer.clientHeight * 90) /
+      (bottomSide[0] - topSide[0]);
+    this.changeCanvasScale(suitScale(Math.min(scaleX, scaleY), this.scaleStep));
+  }
+
+  private updateDefaultNodeLayout() {
+    const x = valueRoundByStep(
+      this.offsetX + this.flowContainer.clientWidth / 2,
+      this.moveStep
+    );
+    const y = valueRoundByStep(this.offsetY + 100, this.moveStep);
+    this.updateDefaultLayout({ x, y });
+  }
+
+  public setLineStyle(params: FlowLinePoint[], style = "solid") {
+    params.forEach((item) => {
+      const endNode = this.findItemById(item.endId);
+      const startNode = this.findItemById(item.startId);
+      if (!endNode || !startNode) return;
+      endNode.lineData.forEach((lineItem) => {
+        if (lineItem.originId === item.startId) {
+          lineItem.lineStyle = style;
+        }
+      });
+    });
+    this.refreshLineData();
+  }
+
+  public setLineStyleByNode(ids: string[], style = "solid") {
+    const hasCompleteId: string[] = [];
+    ids.forEach((item) => {
+      const node = this.findItemById(item);
+      if (!node) return;
+      if (hasCompleteId.includes(item)) return;
+      hasCompleteId.push(item);
+      node.lineData.forEach((lineItem) => {
+        lineItem.lineStyle = "style";
+      });
+    });
+    this.refreshLineData();
+  }
+
+  @Emit("updateDefaultLayout")
+  private updateDefaultLayout(layout: FlowNodeLayout) {
+    return layout;
+  }
+
+  public refreshFlowLayout() {
+    this.initCanvas();
+  }
+
+  public connextNodeByLine(params: FlowLinePoint) {
+    if ([params.startId, params.endId].some((item) => !item)) return;
+    const endNode = this.findItemById(params.endId);
+    const startNode = this.findItemById(params.startId);
+    if (!endNode || !startNode) return;
+    if (endNode.lineData.map((item) => item.originId).includes(params.startId))
+      return;
+    if (startNode.lineData.map((item) => item.originId).includes(params.endId))
+      return;
+    endNode.lineData.push({
+      originId: params.startId,
+      originDirection: 1,
+      targetDirection: -1,
+      targetId: params.endId,
+      path: null,
+      type: "formal",
+      lineStyle: "solid",
+      lineLayout: [],
+    });
+    startNode.childNode.push(params.endId);
+    this.refreshLineData("new");
+  }
+
+  public replaceNodeId(oldId: string, newId: string) {
+    const item = this.findItemById(oldId);
+    if (!item) return;
+    item.id = newId;
+    item.lineData.forEach((item) => {
+      item.targetId = newId;
+      const parentNode = this.findItemById(item.originId);
+      if (!parentNode) return;
+      replaceMembers(parentNode.childNode, oldId, newId);
+    });
+
+    item.childNode.forEach((childId) => {
+      const childNode = this.findItemById(childId);
+      if (!childNode) return;
+      childNode.lineData.forEach((item) => {
+        if (item.originId === oldId) {
+          item.originId = newId;
+        }
+      });
+    });
+    this.refreshLineDataList();
+  }
+  public cancenContextMenu(e: MouseEvent) {
+    e.preventDefault();
+  }
+
+  public dragingMoveItem(e: MouseEvent) {
+    e.preventDefault();
+    if (!this.currentDragItem) return;
+    const item = this.findItemById(this.currentDragItem);
+    if (!item) return;
+    this.dragingItem(e, item);
+  }
+
+  private initEvent() {
+    window.document.addEventListener(
+      "contextmenu",
+      this.cancenContextMenu,
+      false
+    );
+
+    window.addEventListener("resize", this.initCanvas, false);
+
+    window.addEventListener("click", this.initLineData);
+
+    (this.$el as HTMLElement).addEventListener(
+      "mousemove",
+      this.dragingMoveItem,
+      false
+    );
+
+    window.addEventListener("mouseup", this.dragEndItem, true);
+
+    this.$on("hook:beforeDestroy", () => {
+      (this.$el as HTMLElement).removeEventListener(
+        "mousemove",
+        this.dragingMoveItem,
+        false
+      );
+
+      window.removeEventListener("mouseup", this.dragEndItem, true);
+
+      window.removeEventListener("resize", this.initCanvas, false);
+
+      window.removeEventListener("click", this.initLineData, false);
+
+      window.document.removeEventListener(
+        "contextmenu",
+        this.cancenContextMenu,
+        false
+      );
+
+      this.eventBus.$off("dragStartItem", this.dragStartItemHandle);
+
+      this.eventBus.$off("dropItem", this.dropItemHandle);
+
+      this.eventBus.$off("dragEndItem", this.dragEndItemHandle);
+
+      this.eventBus.$off("dragingItem", this.dragingItemHanlde);
+
+      this.eventBus.$off("createLine", this.createLineHandle);
+
+      this.eventBus.$off("moveOnCircle", this.moveOnCircleHandle);
+
+      this.eventBus.$off("moveOnNode", this.moveOnNodeHanlde);
+    });
+  }
+
+  public mounted() {
+    this.initEvent();
+    window.setTimeout(() => {
+      this.initCanvas();
+    }, 0);
   }
 }

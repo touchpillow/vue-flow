@@ -82,3 +82,7 @@ export interface FlowNodeLayoutBorder {
   w: number;
   h: number;
 }
+export interface FlowLinePoint {
+  startId: string;
+  endId: string;
+}

@@ -4,13 +4,13 @@ const isNull = (value: any) => {
 const deepCopy = (value: any): any => {
   return JSON.parse(JSON.stringify(value));
 };
-const valueRoundByStep = (value: number, step: number, basic = 0) => {
+const valueRoundByStep = (value: number, step = 1, basic = 0) => {
   return Math.round((value - basic) / step) * step + basic;
 };
-const valueCeilByStep = (value: number, step: number, basic = 0) => {
+const valueCeilByStep = (value: number, step = 1, basic = 0) => {
   return Math.ceil((value - basic) / step) * step + basic;
 };
-const valueFloorByStep = (value: number, step: number, basic = 0) => {
+const valueFloorByStep = (value: number, step = 1, basic = 0) => {
   return (((value - basic) / step) | 0) * step + basic;
 };
 
@@ -36,6 +36,18 @@ const getArithmeticbyStep = (
 const inRange = (valueRange: number[], value: number) => {
   return value >= valueRange[0] && value <= valueRange[1];
 };
+
+const suitScale = (scale: number, step: number, basic = 100): number => {
+  return (((scale - basic) / step) | 0) * step + basic;
+};
+const replaceMembers = <T = number | string>(
+  list: T[],
+  oldVal: T,
+  newVal: T
+) => {
+  const index = list.findIndex((item) => item === oldVal);
+  list.splice(index, 1, newVal);
+};
 export {
   isNull,
   deepCopy,
@@ -44,4 +56,6 @@ export {
   valueRoundByStep,
   getArithmeticbyStep,
   inRange,
+  suitScale,
+  replaceMembers,
 };
