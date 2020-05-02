@@ -86,3 +86,11 @@ export interface FlowLinePoint {
   startId: string;
   endId: string;
 }
+export declare class Flow extends Vue.Vue {
+  isCreatedTempLine: boolean;
+}
+export interface FlowEmitParams<T> {
+  event?: T;
+  id?: string;
+  direction?: number;
+}

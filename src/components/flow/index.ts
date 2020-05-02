@@ -42,31 +42,31 @@ import { SpecialValueMap } from "types/global";
   name: "Flow",
 })
 export default class Flow extends Vue {
-  @Prop({ default: "请拖入节点进行组合" })
+  @Prop({ type: String, default: "请拖入节点进行组合" })
   public placeholder!: string;
 
-  @Prop({ default: "" })
+  @Prop({ type: String, default: "" })
   public limitFun!: string;
 
-  @Prop({ default: true })
+  @Prop({ type: Boolean, default: true })
   private moveable!: boolean;
 
   // nodelistdata
-  @Prop()
+  @Prop({ type: Array, default: [] })
   private listData!: FlowNodeItem[];
 
-  @Prop({ default: 10 })
+  @Prop({ type: Number, default: 10 })
   private moveStep!: number;
 
-  @Prop({ default: 5 })
+  @Prop({ type: Number, default: 5 })
   private scaleStep!: number;
-  @Prop({ default: 7 })
+  @Prop({ type: Number, default: 7 })
   private clickRange!: number;
 
-  @Prop({ default: false })
+  @Prop({ type: Boolean, default: false })
   private isDragItem!: boolean;
 
-  @Prop({ default: "edit" })
+  @Prop({ type: String, default: "edit" })
   private mode!: string;
 
   @Provide()
