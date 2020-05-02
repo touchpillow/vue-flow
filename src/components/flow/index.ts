@@ -20,7 +20,12 @@ import {
   valueFloorByStep,
   inRange,
 } from "@/assets/util";
-import { defaultLineData, circleDirection, flowTipConfig } from "./config";
+import {
+  defaultLineData,
+  circleDirection,
+  flowTipConfig,
+  drawWithArrowheads,
+} from "./config";
 import { SpecialValueMap } from "types/global";
 
 @Component({
@@ -214,7 +219,7 @@ export default class Flow extends Vue {
   private dropItemHandle(params: FlowEventParams) {
     const item = this.findItemById(params.id);
     if (!item) return;
-    this.dropItem(params.event, params.id);
+    this.dropItem(params.event, item);
   }
 
   private dragEndItemHandle(params: FlowEventParams<MouseEvent>) {
@@ -756,7 +761,7 @@ export default class Flow extends Vue {
     this.refreshTempLine({ x, y });
   }
 
-  private moneOnNode(e: MouseEvent, item: FlowNodeItem) {
+  private moveOnNode(e: MouseEvent, item: FlowNodeItem) {
     const x = e.offsetX + item.x - item.w / 2;
     const y = e.offsetY + item.y - item.h / 2;
     this.refreshTempLine({ x, y });
@@ -900,7 +905,7 @@ export default class Flow extends Vue {
 
   private getChildNodeLine(id: string, currentNodeList: string[]): string[] {
     const currentNode = this.findItemById(id);
-    if (!currentNode) return;
+    if (!currentNode) return currentNodeList;
     currentNode.childNode.forEach((item) => {
       const childNode = this.findItemById(item);
       if (!childNode) return;
@@ -1069,5 +1074,63 @@ export default class Flow extends Vue {
     flowlineItem: FlowLineItem,
     ctx: CanvasRenderingContext2D,
     selector: string
-  ) {}
+  ) {
+    const originItem = this.findItemById(flowlineItem.originId);
+    const curItemList = this.currentLineItem.map(
+      (curItem) => `${curItem.originId}-${curItem.targetId}`
+    );
+    switch (flowlineItem.type) {
+      case "formal":
+        const targetItem = this.findItemById(flowlineItem.targetId);
+        if (!originItem || !targetItem) return;
+        const linRes = drawWithArrowheads(
+          originItem.x,
+          originItem.y + (originItem.h / 2) * flowlineItem.originDirection,
+          flowlineItem.originDirection,
+          targetItem.x,
+          targetItem.y +
+            (flowlineItem.targetDirection * (targetItem.h + 0)) / 2,
+          flowlineItem.targetDirection,
+          ctx,
+          selector === "canvas" ? 0 : -this.offsetX,
+          selector === "canvas" ? 0 : -this.offsetY,
+          curItemList.includes(
+            `${flowlineItem.originId}-${flowlineItem.targetId}`
+          )
+            ? "#4d81ef"
+            : "#7c8baf",
+          flowlineItem.lineStyle
+        );
+        flowlineItem.path = linRes.path;
+        flowlineItem.lineLayout = linRes.layout;
+        break;
+      case "temp":
+        if (!originItem) return;
+        const tempLineLayout = this.tempLineLayout;
+        flowlineItem.path = drawWithArrowheads(
+          originItem.x,
+          originItem.y + (originItem.h / 2) * flowlineItem.originDirection,
+          flowlineItem.originDirection,
+          tempLineLayout.x,
+          tempLineLayout.y,
+          flowlineItem.targetDirection,
+          ctx,
+          selector === "canvas" ? 0 : -this.offsetX,
+          selector === "canvas" ? 0 : -this.offsetY,
+          "#7c8baf",
+          flowlineItem.lineStyle
+        ).path;
+    }
+  }
+
+  private async initCanvas() {
+    const canvas = this.$refs.canvasCopy as HTMLCanvasElement;
+    const parent = canvas.parentElement;
+    if (!parent) return;
+    canvas.width = parent.offsetWidth;
+    canvas.height = parent.offsetHeight;
+    this.initLayoutBorder();
+    this.updateDefaultNodeLayout();
+    await this.refreshLineData();
+  }
 }
