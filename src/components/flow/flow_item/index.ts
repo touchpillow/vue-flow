@@ -74,7 +74,9 @@ export default class FlowItem extends Vue {
 
   public dropItem(e: DragEvent) {
     e.preventDefault();
-    const datastring = e.dataTransfer?.getData("text/plain");
+    const dataTransfer = e.dataTransfer;
+    if (!dataTransfer) return;
+    const datastring = dataTransfer.getData("text/plain");
     if (!datastring) return;
     this.emitEvent("dropItem", {
       event: e,

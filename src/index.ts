@@ -6,5 +6,6 @@ const Components = {
   FlowItem,
 };
 Vue.component("flow", Flow);
+Vue.component("flow-item", FlowItem);
 
 export default Components;

@@ -29,7 +29,7 @@ import {
   inRange,
   suitScale,
   replaceMembers,
-} from "@/assets/util";
+} from "../../assets/util";
 import {
   defaultLineData,
   circleDirection,
@@ -558,8 +558,9 @@ export default class Flow extends Vue {
       left: `-${offsetX}px`,
       top: `-${offsetY}px`,
       transform: `scale(${this.canvasScale / 100})`,
-      "transform-origin": `${offsetX + (canvas?.width ?? 0) / 2}px ${offsetY +
-        (canvas?.height ?? 0) / 2}px`,
+      "transform-origin": `${offsetX +
+        (canvas ? canvas.width : 0) / 2}px ${offsetY +
+        (canvas ? canvas.height : 0) / 2}px`,
       // "background-color": this.canvasBg,
     };
   }
@@ -1189,11 +1190,11 @@ export default class Flow extends Vue {
     const parentElement = this.flowContainer;
     if (!parentElement) return;
     this.offsetX = valueRoundByStep(
-      (10000 - parentElement?.offsetWidth ?? 0) / 2,
+      (10000 - (parentElement ? parentElement.offsetWidth : 0)) / 2,
       1
     );
     this.offsetY = valueRoundByStep(
-      (5000 - parentElement?.offsetHeight ?? 0) / 2,
+      (5000 - (parentElement ? parentElement.offsetHeight : 0)) / 2,
       1
     );
     const keyMaP: SpecialValueMap<(number | string)[]> = {

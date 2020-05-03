@@ -7,7 +7,9 @@
       draggable
       @dragstart="dragStart($event, item)"
       @dragend="dragEnd($event, item)"
-    >{{ item.label }}</div>
+    >
+      {{ item.label }}
+    </div>
   </div>
 </template>
 
@@ -28,7 +30,7 @@ export default class Left extends Vue {
       target.offsetWidth / 2,
       target.offsetHeight / 2
     );
-    datatransfer?.setData("text/plain", JSON.stringify(item));
+    datatransfer.setData("text/plain", JSON.stringify(item));
     // e.da;
     this.dragItem(true);
   }
