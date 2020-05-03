@@ -82,6 +82,12 @@ export default class FlowItem extends Vue {
     });
   }
 
+  public clickItem(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.cancelBubble = true;
+  }
+
   public dragingItem(e: MouseEvent) {
     if (!this.canDrag) return;
     e.preventDefault();

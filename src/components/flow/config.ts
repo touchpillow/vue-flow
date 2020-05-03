@@ -116,7 +116,6 @@ function drawWithArrowheads(
   lineColor: string,
   lineStyle: string,
   defaultLineColor: string,
-  highlightLineColor: string,
   arrowWidth: number,
   arrowHeight: number
 ) {
@@ -158,7 +157,6 @@ function drawWithArrowheads(
   // path.rect(0, 0, 10000, 5000);
   path.moveTo(x1, y1);
   lineNodeList.forEach((item) => {
-    console.log("line");
     path.lineTo(item.x, item.y);
   });
   // path.closePath();

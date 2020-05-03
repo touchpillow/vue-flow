@@ -70,6 +70,8 @@ export default class Flow extends Vue {
 
   @Prop({ type: Boolean, default: false })
   private isDragItem!: boolean;
+  @Prop({ type: Boolean, default: false })
+  private isFlowThrough!: boolean;
 
   @Prop({ type: String, default: "edit" })
   private mode!: string;
@@ -913,6 +915,7 @@ export default class Flow extends Vue {
   }
 
   public async clickLine(e: MouseEvent) {
+    if (!this.isFlowThrough) return;
     e.preventDefault();
     await this.initCurrentLineData();
     const lineItem = this.getChooseLine(e)[0];
@@ -1143,7 +1146,6 @@ export default class Flow extends Vue {
             : this.defaultLineColor,
           flowlineItem.lineStyle,
           this.defaultLineColor,
-          this.highlightLineColor,
           this.arrowWidth,
           this.arrowHeight
         );
@@ -1166,7 +1168,6 @@ export default class Flow extends Vue {
           this.defaultLineColor,
           flowlineItem.lineStyle,
           this.defaultLineColor,
-          this.highlightLineColor,
           this.arrowWidth,
           this.arrowHeight
         ).path;
@@ -1185,7 +1186,6 @@ export default class Flow extends Vue {
   }
 
   private initLayoutBorder() {
-    const canvas = this.$refs.canvas as HTMLCanvasElement;
     const parentElement = this.flowContainer;
     if (!parentElement) return;
     this.offsetX = valueRoundByStep(
