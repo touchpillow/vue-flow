@@ -38,6 +38,15 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 # example for use
 
+import Flow from "@touchpillow/vue-flow";
+@Component({
+name: "Drag",
+components: {
+flow: Flow.Flow,
+flowItem: Flow.FlowItem,
+},
+})
+
     <flow @dropItem="addItem" :listData="listData: isDragItem="status">
         <flow-item v-for="item in listData" :key="item.id :itemData="item">
             <div class="com-item">{{ item.componentData.label }}div>
