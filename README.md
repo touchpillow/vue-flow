@@ -218,6 +218,10 @@ startId:id1,
 endId:id2,
 }
 
+# flow slot
+
+placeholder:为空时的占位内容，默认居中
+
 # flow-item attributes
 
 ## itemData

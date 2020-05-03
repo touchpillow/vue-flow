@@ -183,6 +183,10 @@ startId:id1,
 endId:id2,
 }
 
+# flow slot
+
+placeholder:Space-time placeholder content, centered by default
+
 # flow-item attributes
 
 ## itemData
