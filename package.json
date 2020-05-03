@@ -1,6 +1,6 @@
 {
   "name": "@touchpillow/vue-flow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "main": "dist/vue-flow.common.js",
   "files": [
@@ -21,8 +21,9 @@
   "description": "A Flow Component for Vue.js.",
   "homepage": "https://github.com/touchpillow/vue-flow",
   "keywords": [
+    "vue-flow",
     "vue",
-    "vue-flow"
+    "ts"
   ],
   "typings": "types/index.d.ts",
   "dependencies": {
