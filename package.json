@@ -1,14 +1,33 @@
 {
-  "name": "vue-flow",
+  "name": "@touchpillow/vue-flow",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "main": "dist/vue-flow.common.js",
+  "files": [
+    "dist/*",
+    "src/*",
+    "public/*",
+    "*.json",
+    "*.js",
+    "*.ts",
+    "*.svg"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build_boundle": "vue-cli-service build --target lib --name vue-flow src/index.ts"
   },
+  "description": "A Flow Component for Vue.js.",
+  "homepage": "https://github.com/touchpillow/vue-flow",
+  "keywords": [
+    "vue",
+    "vue-flow"
+  ],
+  "typings": "types/index.d.ts",
   "dependencies": {
     "core-js": "^3.6.4",
+    "user": "0.0.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^8.4.1",

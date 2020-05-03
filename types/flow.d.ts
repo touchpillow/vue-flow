@@ -88,6 +88,12 @@ export interface FlowLinePoint {
 }
 export declare class Flow extends Vue.Vue {
   isCreatedTempLine: boolean;
+  refreshFlowLayout: () => void;
+  connectNodeByLine: (params: FlowLinePoint) => void;
+  replaceNodeId: (oldId: string, newId: string) => void;
+  initLineListData: () => void;
+  setLineStyle: (params: FlowLinePoint, style?: string) => void;
+  setLineStyleByNode: (ids: string[], style?: string) => void;
 }
 export interface FlowEmitParams<T> {
   event?: T;
