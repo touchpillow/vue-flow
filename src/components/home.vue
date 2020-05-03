@@ -8,6 +8,7 @@
         <flow-item v-for="item in listData" :key="item.id" :itemData="item">
           <div class="com-item">{{ item.componentData.label }}</div>
         </flow-item>
+        <span slot="placeholder">123</span>
       </flow>
     </section>
   </section>

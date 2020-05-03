@@ -72,6 +72,9 @@
         @click="deleteLineItem"
         v-show="showLineDelButton"
       />
+      <div v-if="!listData.length" class="full empty-box flex xy-axis-center">
+        <slot name="placeholder"></slot>
+      </div>
     </div>
     <div v-show="!isPreviewMode" class="flow-tool" @dragover.stop="void 0">
       <tool-box
@@ -83,9 +86,6 @@
         :defaultFun="defaultFun"
         @toolAction="toolAction"
       ></tool-box>
-      <div v-if="!listData.length" class="full empty-box flex xy-axis-center">
-        <slot name="placeholder"></slot>
-      </div>
     </div>
   </div>
 </template>

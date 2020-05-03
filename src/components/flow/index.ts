@@ -46,9 +46,6 @@ import { ToolBox } from "../index.view";
   },
 })
 export default class Flow extends Vue {
-  @Prop({ type: String, default: "请拖入节点进行组合" })
-  public placeholder!: string;
-
   @Prop({ type: String, default: "" })
   public limitFun!: string;
 
@@ -1192,11 +1189,11 @@ export default class Flow extends Vue {
     const parentElement = this.flowContainer;
     if (!parentElement) return;
     this.offsetX = valueRoundByStep(
-      (canvas.width - parentElement.offsetWidth) / 2,
+      (10000 - parentElement?.offsetWidth ?? 0) / 2,
       1
     );
     this.offsetY = valueRoundByStep(
-      (canvas.height - parentElement.offsetHeight) / 2,
+      (5000 - parentElement?.offsetHeight ?? 0) / 2,
       1
     );
     const keyMaP: SpecialValueMap<(number | string)[]> = {
