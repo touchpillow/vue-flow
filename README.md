@@ -1,5 +1,7 @@
 # vue-flow
 
+这是一个 vue-flow 组件的简单 demo
+
 ## Project setup
 
 ```

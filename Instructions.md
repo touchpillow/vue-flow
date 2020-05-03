@@ -1,3 +1,7 @@
+# desc
+
+thit's a simple demo for vue-flow
+
 # example for use
 
     <flow @dropItem="addItem" :listData="listData: isDragItem="status">
