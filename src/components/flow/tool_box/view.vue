@@ -1,24 +1,60 @@
 <template>
   <div class="tool-box flex" @click.stop="void 0">
-    <div v-show="showFun('scale')" class="scale-scale tool-part flex xy-axis-center">
-      <i class="el-icon-zoom-out scale-button" :title="`reduce`" @click="changeScale(-1)"></i>
-      <div class="scale-text">{{ canvasScale }}%</div>
-      <i class="el-icon-zoom-in scale-button" :title="`plus`" @click="changeScale(1)"></i>
-    </div>
-    <div v-show="showFun('suit')" class="scale-suit tool-part flex xy-axis-center">
-      <i class="el-icon-aim" @click="suitToCanvas" :title="`suit`"></i>
-    </div>
-    <div v-show="showFun('move')" class="move-button tool-part flex xy-axis-center">
+    <div
+      v-show="showFun('scale')"
+      class="scale-scale tool-part flex xy-axis-center"
+    >
       <img
-        src="../../../assets/flow_move.svg"
+        :src="getIcon(`flow_reduce.svg`)"
+        class="tool-button"
+        alt
+        :title="`reduce`"
+        @click="changeScale(-1)"
+      />
+      <div class="scale-text">{{ canvasScale }}%</div>
+      <img
+        :src="getIcon(`flow_plus.svg`)"
+        class="tool-button"
+        alt
+        :title="`plus`"
+        @click="changeScale(1)"
+      />
+    </div>
+    <div
+      v-show="showFun('suit')"
+      class="scale-suit tool-part flex xy-axis-center"
+    >
+      <img
+        :src="getIcon(`flow_suit.svg`)"
+        class="tool-button"
+        alt
+        :title="`scale to screen`"
+        @click="suitToCanvas"
+      />
+    </div>
+    <div
+      v-show="showFun('move')"
+      class="move-button tool-part flex xy-axis-center"
+    >
+      <img
+        :src="getIcon(`flow_move${canvasIsMoveMode ? '_cur' : ''}.svg`)"
         class="tool-button"
         alt
         :title="`move`"
         @click="intoMoveMode"
       />
     </div>
-    <div class="tool-part compose flex xy-axis-center" v-show="showFun('compose')">
-      <el-checkbox v-model="toolIsAutoCompose" @change="changeAutoCompose">auto compose</el-checkbox>
+    <div
+      class="tool-part compose flex xy-axis-center"
+      v-show="showFun('compose')"
+    >
+      <img
+        :src="getIcon(`flow_compose${isAutoCompose ? '_cur' : ''}.svg`)"
+        class="scale-button"
+        alt
+        :title="`auto compose`"
+        @click="changeAutoCompose"
+      />
     </div>
   </div>
 </template>

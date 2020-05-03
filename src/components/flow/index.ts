@@ -66,6 +66,10 @@ export default class Flow extends Vue {
   private scaleStep!: number;
   @Prop({ type: Number, default: 7 })
   private clickRange!: number;
+  @Prop({ type: Number, default: 12 })
+  private arrowWidth!: number;
+  @Prop({ type: Number, default: 8 })
+  private arrowHeight!: number;
 
   @Prop({ type: Boolean, default: false })
   private isDragItem!: boolean;
@@ -76,6 +80,12 @@ export default class Flow extends Vue {
   private canvasBg!: string;
   @Prop({ type: String, default: "solid" })
   private defaultLineStyle!: string;
+  @Prop({ type: String, default: "scale,suit,move" })
+  public defaultFun!: string;
+  @Prop({ type: String, default: "#515151" })
+  public defaultLineColor!: string;
+  @Prop({ type: String, default: "#4d81ef" })
+  public highlightLineColor!: string;
 
   @Provide()
   private provider: FlowProvide = {
@@ -176,7 +186,7 @@ export default class Flow extends Vue {
 
   private isCanvasStartDrag = false;
 
-  public isAutoCompose = true;
+  public isAutoCompose = false;
 
   private hasMove = false;
 
@@ -1100,7 +1110,7 @@ export default class Flow extends Vue {
         return res;
       }, new Path2D());
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = "#7c8baf";
+    ctx.strokeStyle = this.defaultLineColor;
     ctx.setLineDash([5, 0]);
     ctx.stroke(path);
   }
@@ -1132,9 +1142,13 @@ export default class Flow extends Vue {
           curItemList.includes(
             `${flowlineItem.originId}-${flowlineItem.targetId}`
           )
-            ? "#4d81ef"
-            : "#7c8baf",
-          flowlineItem.lineStyle
+            ? this.highlightLineColor
+            : this.defaultLineColor,
+          flowlineItem.lineStyle,
+          this.defaultLineColor,
+          this.highlightLineColor,
+          this.arrowWidth,
+          this.arrowHeight
         );
         flowlineItem.path = linRes.path;
         flowlineItem.lineLayout = linRes.layout;
@@ -1152,8 +1166,12 @@ export default class Flow extends Vue {
           ctx,
           selector === "canvas" ? 0 : -this.offsetX,
           selector === "canvas" ? 0 : -this.offsetY,
-          "#7c8baf",
-          flowlineItem.lineStyle
+          this.defaultLineColor,
+          flowlineItem.lineStyle,
+          this.defaultLineColor,
+          this.highlightLineColor,
+          this.arrowWidth,
+          this.arrowHeight
         ).path;
     }
   }
@@ -1344,6 +1362,10 @@ export default class Flow extends Vue {
     const item = this.findItemById(this.currentDragItem);
     if (!item) return;
     this.dragingItem(e, item);
+  }
+
+  public getIcon(src: string) {
+    return require(`./../../assets/${src}`);
   }
 
   private initEvent() {

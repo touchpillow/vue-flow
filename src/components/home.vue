@@ -19,7 +19,7 @@ import { FlowNodeItem, FlowNodeLayout, FlowDropData } from "../../types/flow";
 import { ComponentNode } from "../../types/global";
 @Component({
   name: "Home",
-  components: { Left, FlowItem, Flow }
+  components: { Left, FlowItem, Flow },
 })
 export default class Home extends Vue {
   public status = false;
@@ -47,7 +47,7 @@ export default class Home extends Vue {
       lineData: [],
       childNode: [],
       canvasScale: 100,
-      showFocus
+      showFocus,
     };
   }
 

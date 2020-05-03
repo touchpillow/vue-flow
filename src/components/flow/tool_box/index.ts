@@ -12,11 +12,11 @@ export default class ToolBox extends Vue {
   public mode!: string;
   @Prop({ type: String, default: "" })
   public limitFun!: string;
+  @Prop({ type: String, default: "scale,move,suit" })
+  public defaultFun!: string;
 
   @Prop({ type: Boolean, default: true })
   public isAutoCompose!: boolean;
-
-  public toolIsAutoCompose = false;
 
   @Emit("toolAction")
   public toolAction(params: CommonSelectData<string | number>) {
@@ -26,9 +26,15 @@ export default class ToolBox extends Vue {
   private get limitFunList() {
     return this.limitFun.split(",");
   }
+  private get defaultFunList() {
+    return this.defaultFun.split(",");
+  }
 
   private getFun(fun: string) {
-    return !(this.mode === "limitEdit" && !this.limitFunList.includes(fun));
+    return (
+      (this.mode === "limitEdit" && this.limitFunList.includes(fun)) ||
+      (this.mode === "edit" && this.defaultFunList.includes(fun))
+    );
   }
 
   public showFun(type: string) {
@@ -40,9 +46,6 @@ export default class ToolBox extends Vue {
       label: "move",
       value: "",
     });
-  }
-  public created() {
-    this.toolIsAutoCompose = this.isAutoCompose;
   }
 
   public changeAutoCompose() {
@@ -64,5 +67,9 @@ export default class ToolBox extends Vue {
       label: "suit",
       value: "",
     });
+  }
+
+  public getIcon(src: string) {
+    return require(`./../../../assets/${src}`);
   }
 }

@@ -114,15 +114,19 @@ function drawWithArrowheads(
   offsetX: number,
   offsetY: number,
   lineColor: string,
-  lineStyle: string
+  lineStyle: string,
+  defaultLineColor: string,
+  highlightLineColor: string,
+  arrowWidth: number,
+  arrowHeight: number
 ) {
   const x1 = x + offsetX;
   const y1 = y + offsetY;
   const x2 = x3 + offsetX;
   const y2 = y3 + offsetY;
   // arbitrary styling
-  ctx.strokeStyle = "#7c8baf";
-  ctx.fillStyle = "#7c8baf";
+  ctx.strokeStyle = defaultLineColor;
+  ctx.fillStyle = defaultLineColor;
   ctx.lineWidth = 1.5;
   // draw the line
   ctx.beginPath();
@@ -162,7 +166,8 @@ function drawWithArrowheads(
   // path3.addPath(path);
   lineNodeList.unshift({ x: x1, y: y1 });
   // ctx.stroke(path);
-  if (lineColor === "#4d81ef") {
+  if (lineColor !== defaultLineColor) {
+    ctx.strokeStyle = lineColor;
     ctx.stroke(path);
   }
   if (lineStyle === "dash") {
@@ -172,7 +177,7 @@ function drawWithArrowheads(
   }
   const endRadians =
     Math.atan(Infinity) - (targetDirection * (90 * Math.PI)) / 180;
-  drawArrowhead(ctx, x2, y2, endRadians, lineColor);
+  drawArrowhead(ctx, x2, y2, endRadians, lineColor, arrowWidth, arrowHeight);
   return {
     path,
     layout: lineNodeList,
@@ -183,9 +188,11 @@ function drawArrowhead(
   x: number,
   y: number,
   radians: number,
-  lineColor: string
+  lineColor: string,
+  arrowWidth: number,
+  arrowHeight: number
 ) {
-  ctx.lineJoin = "miter";
+  ctx.lineJoin = "round";
   ctx.lineWidth = 1;
   ctx.strokeStyle = lineColor;
   ctx.fillStyle = lineColor;
@@ -194,8 +201,8 @@ function drawArrowhead(
   ctx.translate(x, y);
   ctx.rotate(radians);
   ctx.moveTo(0, 0);
-  ctx.lineTo(5, 20);
-  ctx.lineTo(-5, 20);
+  ctx.lineTo(arrowHeight / 2, arrowWidth);
+  ctx.lineTo((-1 * arrowHeight) / 2, arrowWidth);
   ctx.closePath();
   ctx.restore();
   ctx.fill();

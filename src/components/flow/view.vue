@@ -7,9 +7,13 @@
     @dragenter="dragEnter($event)"
     @click.stop="clickCanvas($event)"
   >
-    <canvas v-show="!canvasIsMoveMode" ref="canvasCopy" class="canvas-copy"></canvas>
+    <canvas
+      v-show="!canvasIsMoveMode"
+      ref="canvasCopy"
+      class="canvas-copy"
+    ></canvas>
     <div
-      v-show="isPreviewMode||isLimitEditMode"
+      v-show="isPreviewMode || isLimitEditMode"
       class="previe-dialog dialog"
       @dragover.stop="void 0"
     ></div>
@@ -31,35 +35,43 @@
       @mousemove.self="createdTempLine($event)"
       @drop.stop="dropCanvas($event)"
     >
-      <canvas v-show="canvasIsMoveMode" ref="canvas" class="canvas" width="10000" height="5000"></canvas>
+      <canvas
+        v-show="canvasIsMoveMode"
+        ref="canvas"
+        class="canvas"
+        width="10000"
+        height="5000"
+      ></canvas>
       <slot></slot>
       <div
         v-show="showHorizontalTipLine"
         class="tip-line horizontal"
-        :style="getTipLineStyle('y','top')"
+        :style="getTipLineStyle('y', 'top')"
       ></div>
       <div
         v-show="showHorizontalTipLine"
         class="tip-line horizontal"
-        :style="getTipLineStyle('y','bottom')"
+        :style="getTipLineStyle('y', 'bottom')"
       ></div>
       <div
         v-show="showVerticaltipLine"
         class="tip-line vertical"
-        :style="getTipLineStyle('x','top')"
+        :style="getTipLineStyle('x', 'top')"
       ></div>
       <div
         v-show="showVerticaltipLine"
         class="tip-line vertical"
-        :style="getTipLineStyle('x','bottom')"
+        :style="getTipLineStyle('x', 'bottom')"
       ></div>
-      <i
+      <img
+        :src="getIcon(`flow_delete.svg`)"
         class="el-icon-remove-outline line-del"
+        alt
         :title="`delete`"
         :style="getLineDelStyle"
         @click="deleteLineItem"
         v-show="showLineDelButton"
-      ></i>
+      />
     </div>
     <div v-show="!isPreviewMode" class="flow-tool" @dragover.stop="void 0">
       <tool-box
@@ -68,6 +80,7 @@
         :mode="mode"
         :limitFun="limitFun"
         :isAutoCompose="isAutoCompose"
+        :defaultFun="defaultFun"
         @toolAction="toolAction"
       ></tool-box>
       <div v-if="!listData.length" class="full empty-box flex xy-axis-center">
@@ -76,7 +89,5 @@
     </div>
   </div>
 </template>
-<script lang="ts" src="./index.ts">
-</script>
-<style lang="less" src="./style.less" scoped>
-</style>
+<script lang="ts" src="./index.ts"></script>
+<style lang="less" src="./style.less" scoped></style>
