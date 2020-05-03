@@ -221,3 +221,13 @@ childNode: saves the child nodes of the node
 lineData: save line data
 canvasScale: save the canvas scaling
 componentData: the data of the node itself
+
+# Precautions
+
+## click event on node
+
+In order to be compatible with the drag and drop of the Firefox browser, the node itself uses the mouse series of events, so in order to prevent the coupling of click and mouse, I prevented the click event during the capture phase. If you need to trigger the click event on the node itself, please change to the mouseup event
+
+## compatibility
+
+Not compatible with ie
